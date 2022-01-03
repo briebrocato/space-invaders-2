@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable = no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Space</title>
+    <link rel="stylesheet" href="space.css">
+</head>
+<body>
+    
+    <canvas width="640" height="360" id="myCanvas"></canvas>
+    <div id= "score" class="top-left">Score: 0</div>
+    <div id= "gameOver" class="centerText"> </div>
+    <div id= "finalScore" class="scoreStyle"> </div>
+    <script>
+        var bulletActive;
+        let enemyActive;
+        
+        
+
+        window.addEventListener('load', function()
+        {
+        const GAME_WIDTH = 640;
+        const GAME_HEIGHT = 360;
+        //added this in this lesson
+        let gameIsLive = true;
+
+       
+
+        let player = {
+            xPos: 10,
+            yPos: 160,
+            speedX: 4,
+            speedY: 4,
+            width: 30,
+            height: 20,
+            isMoving: false
+        };
+
+   
+    let enemy = {
+            xEnemy: 300,
+            yEnemy: 20,
+            widthEnemy: 300,
+            heightEnemy: 300
+        };
+
+        let bullet = {
+        xBullet: player.xPos,
+        yBullet: player.yPos + 13,
+        widthBullet: 10,
+        heightBullet: 5, 
+        bulletXSpeed: 4 
+
+    };
+
+    let badBullet = {
+        xBB: 300,
+        yBB: Math.floor(Math.random()*399)+1,
+        widthBB: 10,
+        heightBB: 5, 
+        speedBB: 4 
+
+    };
+
+   
+
+
+    let sprites = {};
+
+      
+    
+  
+   
+        
+        function moveSelection(event) { 
+            switch (event.keyCode) {
+                    case 87:
+                    moveUp();
+                    upBullet();
+                    break;
+                    case 83:
+                    moveDown();
+                    downBullet();
+                    break;
+                    case 65:
+                    moveLeft();
+                    leftBullet();
+                    break;
+                    case 68:
+                    moveRight();
+                    rightBullet();
+                    break;
+                    case 13:
+                    sendBullets();
+                    break;
+                    }
+        }
+
+        let canvas = document.getElementById("myCanvas");
+        let ctx = canvas.getContext("2d");
+       
+
+        function moveLeft(){
+                player.xPos +=player.speedX - 12;
+                                   
+                
+            }
+            function moveUp(){
+                player.yPos += player.speedY - 12;
+                               
+                                                                       
+            }
+            function moveRight(){
+                player.xPos += player.speedX + 5 ;
+                
+                
+                                
+            }
+            function moveDown(){
+                player.yPos += player.speedY + 5;
+                                  
+            }
+
+            function upBullet(){
+               
+          
+               bullet.yBullet +=player.speedY - 12;
+           
+                   
+           
+           }
+
+           function downBullet(){
+           
+               bullet.yBullet +=player.speedY + 5;                     
+           
+          }
+
+          function rightBullet(){
+           
+           bullet.xBullet +=player.speedX + 5;                     
+           
+          }
+
+          function leftBullet(){
+           
+          bullet.xBullet +=player.speedX - 12; 
+                            
+          
+          }
+            function sendBullets(){
+
+                bulletActive = true;
+                player.isMoving = false;
+ 
+            }
+          
+           
+  
+       
+       
+            let load = function() {
+                sprites.player = new Image();
+            sprites.player.src = "images/player2.png";
+            sprites.background = new Image();
+            sprites.background.src = "images/background1.png";
+            sprites.enemy = new Image();
+            sprites.enemy.src = "images/enemy3.png";
+           
+            };
+
+        
+
+        
+     
+
+        let step = function()
+            {
+            update();
+            draw();
+
+            //added this in this lesson
+            if(gameIsLive)
+                {
+                window.requestAnimationFrame(step);
+                }
+            };
+
+
+            const interval = setInterval(function() {
+                
+            shoot();
+
+            }, 2000);
+
+        let shoot = function()
+        {
+            enemyActive = true;
+        }
+
+
+
+
+        let scoreCounter = 0;
+        
+
+        let update = function()
+            {
+
+            
+
+                if (bullet.xBullet >= 420 && bullet.yBullet >= 20 && bullet.yBullet <= 320)
+                {
+                    scoreCounter += 4;
+                    document.getElementById("score").innerHTML="Score: " + scoreCounter;
+                }
+
+            if(player.isMoving)
+                {
+                player.xPos += player.speedX;
+                }  
+                
+             if(player.xPos >= 200 - player.width)   
+            {
+                player.xPos = 200 - player.width;
+            }
+            else if(player.xPos <= 0)   
+            {
+                player.xPos = 1;
+                bullet.xBullet = 1;
+            }
+            else if(player.yPos <= 0)   
+            {
+                player.yPos = 1;
+                bullet.yBullet = 14;
+                
+            }
+            else if(player.yPos >= 340 - player.height)
+            {
+                player.yPos = 340 - player.height;
+                bullet.yBullet = 340;
+            }
+           
+            if(bulletActive)
+            {
+                bullet.xBullet += bullet.bulletXSpeed;
+            }
+
+            if(enemyActive)
+            {
+                badBullet.xBB -= badBullet.speedBB;
+            }
+            };
+
+        let draw = function() 
+            {
+                    
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+            ctx.drawImage(sprites.background, 0, 0);
+
+            ctx.drawImage(sprites.player, player.xPos, player.yPos);
+            // ctx.fillStyle = "#00FF00";
+            // ctx.fillRect(player.xPos, player.yPos, player.width, player.height);
+
+                
+            if(bulletActive)
+         {
+            ctx.fillStyle = "#00FF00";
+            ctx.fillRect(bullet.xBullet, bullet.yBullet, bullet.widthBullet, bullet.heightBullet);
+            
+            
+         }
+            
+            // ctx.fillStyle = "#0000FF";
+            // var enemyDraw = ctx.fillRect(enemy.xEnemy, enemy.yEnemy, enemy.widthEnemy, enemy.heightEnemy);
+            ctx.drawImage(sprites.enemy, enemy.xEnemy, enemy.yEnemy);
+
+        
+
+         if(bullet.xBullet >= enemy.xEnemy + 140)
+                {
+                    bulletActive = false;
+                   
+                   
+                    bullet.xBullet = player.xPos;
+  
+                }
+
+                // for(let i = 0; i < badBullet.length; i++)
+                // {
+                // ctx.fillStyle = "#FF0000";
+                // ctx.fillRect(badBullet[i].xBB, badBullet[i].yBB, badBullet[i].widthBB, badBullet[i].heightBB,);
+                // }
+               if(enemyActive)
+               {
+                
+                ctx.fillStyle = "#FF0000";
+                ctx.fillRect(badBullet.xBB, badBullet.yBB, badBullet.widthBB, badBullet.heightBB,);
+               }
+
+               if(badBullet.xBB <= 0 - badBullet.widthBB)
+               {
+                // enemyActive = false;
+                badBullet.xBB = 300;
+                badBullet.yBB = Math.floor(Math.random()*319)+1;
+               }
+
+               if(badBullet.xBB >= player.xPos && badBullet.xBB <= player.xPos + player.width && badBullet.yBB >= player.yPos && badBullet.yBB <= player.yPos + player.height)
+               {
+                document.getElementById("gameOver").innerHTML="Game Over";
+                document.getElementById("finalScore").innerHTML="Final Score: " + scoreCounter;
+                gameIsLive = false;
+               }
+           
+               
+            };
+
+     
+           
+                
+            
+//shoot pew pew active
+            
+
+        //added this in this lesson to check collision
+        
+                window.addEventListener("keydown",moveSelection,true);
+
+        load();        
+        step();
+        });
+    </script>
+</body>
+</html>
